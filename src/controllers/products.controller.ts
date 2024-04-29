@@ -22,6 +22,7 @@ class ProductController {
     async getProductCategories(req: ProductRequest, res: Response) {
         try {
             const categories = await productService.getAllCategories();
+
             return res.status(200).json({
                 success: true,
                 message: "categories fetched successfully",
