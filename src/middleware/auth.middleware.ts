@@ -1,8 +1,7 @@
 
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Response } from "express";
 import { getAuth } from "firebase-admin/auth";
 import { CustomRequest } from "../interfaces/custom_data";
-
 
 const authentication = async <T>(
     req: CustomRequest<T>,
