@@ -10,6 +10,7 @@ export interface Product {
     discountPrice: number,
     isDiscounted: boolean,
     productImage: string,
+    amountLeft: number,
     category: string,
     subscribers: string[]
 }
@@ -21,10 +22,12 @@ export interface ProductRequest extends Request {
         productName: string,
         price: number,
         isFlash: boolean,
+        amountLeft: number
         discountPrice: number,
         isDiscounted: boolean,
         productImage: string,
         category: string,
+
         subscribers: string[]
     }
 }
@@ -39,6 +42,7 @@ export interface ProductUpdate {
     discountPrice?: number,
     isDiscounted?: boolean,
     productImage?: string,
+    amountLeft: number,
     category?: string,
     subscribers?: string[]
 }

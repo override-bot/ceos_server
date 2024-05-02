@@ -3,6 +3,7 @@ import { ProductRequest, Product, ProductUpdate } from "../interfaces/product.in
 import productService from "../services/product.service";
 import { ProductModel } from "../models/product.model";
 import authentication from "../middleware/auth.middleware"
+import { productSchema } from "../validators/product.validator";
 
 class ProductController {
     async getProducts(req: ProductRequest, res: Response) {
@@ -99,29 +100,15 @@ class ProductController {
         const data: ProductUpdate = req.body;
         try {
             const { id } = req.params;
-            const allowedKeys: (keyof ProductUpdate)[] = [
-                "id",
-                "sellerId",
-                "description",
-                "dateAdded",
-                "productName",
-                "price",
-                "isFlash",
-                "discountPrice",
-                "isDiscounted",
-                "productImage",
-                "category",
-                "subscribers"
-            ];
-            const invalidKeys = Object.keys(data).filter(key => !allowedKeys.includes(key as keyof ProductUpdate));
-
-            if (invalidKeys.length > 0) {
+            const validation = productSchema.validate(data);
+            if (validation.error) {
                 res.status(400).json({
                     success: false,
-                    message: `Invalid keys found in the request body: ${invalidKeys.join(', ')}`
+                    message: validation.error.details.map((detail: { message: any; }) => detail.message)
                 });
                 return;
             }
+
             const update = await productService.updateProduct(data, id);
             res.status(201).json({
                 success: true,
@@ -148,29 +135,20 @@ class ProductController {
                 "isDiscounted": req.body.isDiscounted ?? false,
                 "productImage": req.body.productImage,
                 "category": req.body.category,
+                "amountLeft": req.body.amountLeft,
                 "subscribers": req.body.subscribers ?? []
             };
             console.log(req.body)
             const sellerId: string = (req as any).userId;
-            const requiredFields = ['productName', 'price', 'productImage', 'category', 'description'];
-            const missingFields: string[] = [];
-
-            requiredFields.forEach(field => {
-                if (!(field in data) || data[field] === null || typeof data[field] == "undefined") {
-                    missingFields.push(field);
-                }
-            });
-            if (missingFields.length > 0) {
-                res.status(422).json({
+            const validation = productSchema.validate(data);
+            if (validation.error) {
+                res.status(400).json({
                     success: false,
-                    message: `Required fields are missing or null: ${missingFields.join(', ')}`
+                    message: "Validation error",
+                    error: validation.error.details.map((detail: { message: any; }) => detail.message)
                 });
+                return;
 
-            } else if (typeof "price" != "number" || typeof "discountPrice" != "number") {
-                res.status(422).json({
-                    success: false,
-                    message: `wrong format`
-                });
             } else {
                 const add = await productService.addProduct({ "sellerId": sellerId, ...data });
                 res.status(201).json({
@@ -179,9 +157,6 @@ class ProductController {
                     data: { "id": add.id, ...data }
                 });
             }
-
-
-
         } catch (error) {
             console.log(req.body.sellerId);
             res.status(500).json({

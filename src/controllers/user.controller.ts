@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import userService from "../services/user.service";
 import { UserRequest, UserUpdate } from "../interfaces/user.interface";
+import { userSchema, userUpdateSchema } from "../validators/user.validator";
 
 class UserController {
     async createUser(req: UserRequest, res: Response) {
@@ -19,20 +20,14 @@ class UserController {
         }
         try {
             const uid: string = (req as any).userId;
-            const requiredFields = ["firstname", 'lastname', 'phoneNumber', 'imageurl',];
-            const missingFields: string[] = [];
-
-            requiredFields.forEach(field => {
-                if (!(field in data) || data[field] === null || typeof data[field] == "undefined") {
-                    missingFields.push(field);
-                }
-            });
-            if (missingFields.length > 0) {
-                res.status(422).json({
+            const validation = userSchema.validate(data);
+            if (validation.error) {
+                res.status(400).json({
                     success: false,
-                    message: `Required fields are missing or null: ${missingFields.join(', ')}`
+                    message: "Validation error",
+                    error: validation.error.details.map((detail: { message: any; }) => detail.message)
                 });
-
+                return;
             } else {
                 const add = await userService.creatUser(data, uid);
                 res.status(201).json({
@@ -40,14 +35,12 @@ class UserController {
                     message: "user created successfully",
                     data: { "id": uid, ...data }
                 })
-
             }
         } catch (error) {
             res.status(500).json({
                 success: false,
                 message: `internal server error`
             });
-
         }
     }
     async getUser(req: Request, res: Response) {
@@ -75,36 +68,18 @@ class UserController {
     }
     async updateUser(req: Request, res: Response) {
         const uid: string = (req as any).userId;
-
         try {
             const data: UserUpdate = req.body;
 
-            // Define allowed keys
-            const allowedKeys: (keyof UserUpdate)[] = [
-                "firstname",
-                "lastname",
-                "ceoScore",
-                "phoneNumber",
-                "instagramLink",
-                "whatsappLink",
-                "twitterLink",
-                "bio",
-                "imageUrl",
-                "username",
-                "subscribers"
-            ];
-
-            // Check if any keys are not allowed
-            const invalidKeys = Object.keys(data).filter(key => !allowedKeys.includes(key as keyof UserUpdate));
-
-            if (invalidKeys.length > 0) {
+            const validation = userUpdateSchema.validate(data);
+            if (validation.error) {
                 res.status(400).json({
                     success: false,
-                    message: `Invalid keys found in the request body: ${invalidKeys.join(', ')}`
+                    message: "Validation error",
+                    error: validation.error.details.map((detail: { message: any; }) => detail.message)
                 });
                 return;
             }
-
             const update = await userService.updateUser(data, uid);
 
             res.status(201).json({
