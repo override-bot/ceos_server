@@ -36,7 +36,10 @@ class ProductService {
             throw error;
         }
     }
-
+    async deleteProduct(id: string) {
+        const firestoreOps: FirestoreOperations = new FirestoreOperations(db, "products");
+        return firestoreOps.deleteDocument(id);
+    }
     async getProductById(id: string) {
         try {
             const firestoreOps: FirestoreOperations = new FirestoreOperations(db, "products");
@@ -51,7 +54,7 @@ class ProductService {
         }
     }
 
-    async updateProduct(data: { [key: string]: any }, id: string) {
+    async updateProduct(data: object, id: string) {
         const firestoreOps: FirestoreOperations = new FirestoreOperations(db, "products");
         const products = await firestoreOps.updateDocumentMap(data, id);
         return products;

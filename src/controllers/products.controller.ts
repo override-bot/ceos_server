@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
-import { ProductRequest, Product } from "../interfaces/product.interface";
+import { ProductRequest, Product, ProductUpdate } from "../interfaces/product.interface";
 import productService from "../services/product.service";
 import { ProductModel } from "../models/product.model";
+import authentication from "../middleware/auth.middleware"
 
 class ProductController {
     async getProducts(req: ProductRequest, res: Response) {
@@ -16,7 +17,7 @@ class ProductController {
         } catch (error) {
             return res.status(500).json({
                 success: false,
-                message: "something went wrong"
+                message: "internal server error"
             })
         }
     }
@@ -33,7 +34,7 @@ class ProductController {
         } catch (error) {
             return res.status(500).json({
                 success: false,
-                message: "something went wrong"
+                message: "internal server error"
             })
         }
     }
@@ -49,7 +50,7 @@ class ProductController {
         } catch (error) {
             return res.status(500).json({
                 success: false,
-                message: "something went wrong"
+                message: "internal server error"
             })
         }
     }
@@ -67,7 +68,7 @@ class ProductController {
             console.log(error);
             return res.status(500).json({
                 success: false,
-                message: "something went wrong"
+                message: "internal server error"
             })
         }
     }
@@ -89,14 +90,55 @@ class ProductController {
             }
             return res.status(500).json({
                 success: false,
-                message: "something went wrong"
+                message: "internal server error"
             })
         }
     }
+
+    async updateProduct(req: Request, res: Response): Promise<void> {
+        const data: ProductUpdate = req.body;
+        try {
+            const { id } = req.params;
+            const allowedKeys: (keyof ProductUpdate)[] = [
+                "id",
+                "sellerId",
+                "description",
+                "dateAdded",
+                "productName",
+                "price",
+                "isFlash",
+                "discountPrice",
+                "isDiscounted",
+                "productImage",
+                "category",
+                "subscribers"
+            ];
+            const invalidKeys = Object.keys(data).filter(key => !allowedKeys.includes(key as keyof ProductUpdate));
+
+            if (invalidKeys.length > 0) {
+                res.status(400).json({
+                    success: false,
+                    message: `Invalid keys found in the request body: ${invalidKeys.join(', ')}`
+                });
+                return;
+            }
+            const update = await productService.updateProduct(data, id);
+            res.status(201).json({
+                success: true,
+                message: "Product updated successfully",
+                data: data
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: "Internal server error"
+            });
+        }
+    }
+
     async addProduct(req: ProductRequest, res: Response) {
         try {
             const data: { [key: string]: any } = {
-                "sellerId": req.body.sellerId,
                 "description": req.body.description,
                 "dateAdded": req.body.dateAdded ?? new Date(),
                 "productName": req.body.productName,
@@ -109,7 +151,8 @@ class ProductController {
                 "subscribers": req.body.subscribers ?? []
             };
             console.log(req.body)
-            const requiredFields = ['sellerId', 'productName', 'price', 'productImage', 'category', 'description'];
+            const sellerId: string = (req as any).userId;
+            const requiredFields = ['productName', 'price', 'productImage', 'category', 'description'];
             const missingFields: string[] = [];
 
             requiredFields.forEach(field => {
@@ -129,7 +172,7 @@ class ProductController {
                     message: `wrong format`
                 });
             } else {
-                const add = await productService.addProduct(data);
+                const add = await productService.addProduct({ "sellerId": sellerId, ...data });
                 res.status(201).json({
                     success: true,
                     message: "product added successfully",
@@ -143,7 +186,7 @@ class ProductController {
             console.log(req.body.sellerId);
             res.status(500).json({
                 success: false,
-                message: error
+                message: "internal server error"
             });
         }
 
