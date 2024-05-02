@@ -1,10 +1,10 @@
 
 import { NextFunction, Response } from "express";
 import { getAuth } from "firebase-admin/auth";
-import { CustomRequest } from "../interfaces/custom_data";
+import { User } from "../interfaces/custom_data";
 
-const authentication = async <T>(
-    req: CustomRequest<T>,
+const authentication = async (
+    req: User,
     res: Response,
     next: NextFunction
 ) => {
@@ -24,7 +24,7 @@ const authentication = async <T>(
     }
     try {
         const decodedToken = await getAuth().verifyIdToken(token);
-        req.customData = decodedToken as T;
+        req.userId = decodedToken.uid;
         next();
     } catch (error) {
         console.log(error);

@@ -15,7 +15,6 @@ export interface Product {
 }
 export interface ProductRequest extends Request {
     product?: {
-        id: string,
         sellerId: string,
         description: string,
         dateAdded: any,

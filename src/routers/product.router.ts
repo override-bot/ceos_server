@@ -4,7 +4,10 @@ import authentication from "../middleware/auth.middleware";
 
 const productRouter = express.Router();
 
-productRouter.get("/products", authentication, productsController.getProducts)
-productRouter.get("/products/:id", authentication, productsController.getProductById)
-productRouter.get("/categories", authentication, productsController.getProductCategories)
+productRouter.get("/products", authentication, productsController.getProducts);
+productRouter.get("/products/:id", authentication, productsController.getProductById);
+productRouter.get("/categories", authentication, productsController.getProductCategories);
+productRouter.get("/:category/products", authentication, productsController.getProductsByCategory);
+productRouter.post("/add", authentication, productsController.addProduct)
+productRouter.get("/:sellerId/products", authentication, productsController.getProductsBySellerId);
 export default productRouter;

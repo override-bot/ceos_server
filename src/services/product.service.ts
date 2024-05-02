@@ -5,13 +5,6 @@ import FirestoreOperations from "./firestore_operations.service";
 
 class ProductService {
 
-    async addProduct(data: Product) {
-        const firestoreOps: FirestoreOperations = new FirestoreOperations(db, "products");
-
-        const product = await firestoreOps.addData(data);
-        return product;
-
-    }
     async getProducts() {
         try {
             const firestoreOps: FirestoreOperations = new FirestoreOperations(db, "products");
@@ -22,7 +15,27 @@ class ProductService {
             throw error;
         }
     }
+    async getProductsbyCategory(category: string) {
+        try {
+            const firestoreOps: FirestoreOperations = new FirestoreOperations(db, "products");
+            const products = await firestoreOps.getWhereIsEqualTo(category, "category");
+            return products.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        } catch (error) {
+            console.error("Error fetching products:", error);
+            throw error;
+        }
+    }
 
+    async getProductsbySellerId(sellerId: string) {
+        try {
+            const firestoreOps: FirestoreOperations = new FirestoreOperations(db, "products");
+            const products = await firestoreOps.getWhereIsEqualTo(sellerId, "sellerId");
+            return products.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        } catch (error) {
+            console.error("Error fetching products:", error);
+            throw error;
+        }
+    }
 
     async getProductById(id: string) {
         try {
@@ -55,5 +68,18 @@ class ProductService {
         });
         return Array.from(uniqueFieldValues);
     }
+
+    async addProduct(data: { [key: string]: any }) {
+        try {
+            const firestoreOps: FirestoreOperations = new FirestoreOperations(db, "products");
+            const response = await firestoreOps.addData(data);
+            return response;
+        } catch (error) {
+            throw error;
+        }
+
+
+    }
 }
+
 export default new ProductService();
