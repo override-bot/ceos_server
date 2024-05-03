@@ -11,7 +11,7 @@ class ProductService {
             const products = await firestoreOps.getDocuments();
             return products.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         } catch (error) {
-            console.error("Error fetching products:", error);
+            console.log(error);
             throw error;
         }
     }
@@ -21,7 +21,7 @@ class ProductService {
             const products = await firestoreOps.getWhereIsEqualTo(category, "category");
             return products.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         } catch (error) {
-            console.error("Error fetching products:", error);
+            console.log(error);
             throw error;
         }
     }
@@ -32,7 +32,7 @@ class ProductService {
             const products = await firestoreOps.getWhereIsEqualTo(sellerId, "sellerId");
             return products.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         } catch (error) {
-            console.error("Error fetching products:", error);
+            console.log(error);
             throw error;
         }
     }
@@ -49,7 +49,7 @@ class ProductService {
             }
             return { id: product.id, ...product.data() };
         } catch (error) {
-            console.error("Error fetching product:", error);
+            console.log(error);
             throw error;
         }
     }
@@ -61,7 +61,7 @@ class ProductService {
     }
 
     async getAllCategories(
-    ): Promise<any[]> {
+    ): Promise<string[]> {
         const firestoreOps: FirestoreOperations = new FirestoreOperations(db, "products");
         const products = await firestoreOps.getDocuments();
         const uniqueFieldValues: Set<string> = new Set();
@@ -72,7 +72,7 @@ class ProductService {
         return Array.from(uniqueFieldValues);
     }
 
-    async addProduct(data: { [key: string]: any }) {
+    async addProduct(data: object) {
         try {
             const firestoreOps: FirestoreOperations = new FirestoreOperations(db, "products");
             const response = await firestoreOps.addData(data);

@@ -125,9 +125,10 @@ class ProductController {
 
     async addProduct(req: ProductRequest, res: Response) {
         try {
-            const data: { [key: string]: any } = {
+            const sellerId: string = (req as any).userId;
+            const data = {
                 "description": req.body.description,
-                "dateAdded": req.body.dateAdded ?? new Date(),
+                "dateAdded": req.body.dateAdded,
                 "productName": req.body.productName,
                 "price": req.body.price,
                 "isFlash": req.body.isFlash ?? false,
@@ -136,10 +137,11 @@ class ProductController {
                 "productImage": req.body.productImage,
                 "category": req.body.category,
                 "amountLeft": req.body.amountLeft,
+                "sellerId": sellerId,
                 "subscribers": req.body.subscribers ?? []
             };
             console.log(req.body)
-            const sellerId: string = (req as any).userId;
+
             const validation = productSchema.validate(data);
             if (validation.error) {
                 res.status(400).json({
@@ -150,7 +152,7 @@ class ProductController {
                 return;
 
             } else {
-                const add = await productService.addProduct({ "sellerId": sellerId, ...data });
+                const add = await productService.addProduct(data);
                 res.status(201).json({
                     success: true,
                     message: "product added successfully",
@@ -158,14 +160,28 @@ class ProductController {
                 });
             }
         } catch (error) {
+            console.log(error)
             console.log(req.body.sellerId);
             res.status(500).json({
                 success: false,
                 message: "internal server error"
             });
         }
-
-
+    }
+    async deleteProduct(req: ProductRequest, res: Response) {
+        const { id } = req.params
+        try {
+            const remove = await productService.deleteProduct(id);
+            res.status(201).json({
+                success: true,
+                message: "product deleted successfully"
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: true,
+                message: "internal server error"
+            });
+        }
     }
 }
 export default new ProductController();

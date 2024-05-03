@@ -27,7 +27,6 @@ export interface ProductRequest extends Request {
         isDiscounted: boolean,
         productImage: string,
         category: string,
-
         subscribers: string[]
     }
 }

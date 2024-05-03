@@ -94,5 +94,20 @@ class UserController {
             });
         }
     }
+    async deleteUser(req: UserRequest, res: Response) {
+        try {
+            const uid: string = (req as any).userId;
+            const remove = await userService.deleteUser(uid);
+            res.status(201).json({
+                success: true,
+                message: "product deleted successfully"
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: true,
+                message: "internal server error"
+            });
+        }
+    }
 }
 export default new UserController();
