@@ -12,17 +12,7 @@ class CartController {
             const uid: string = (req as any).userId;
             const data: SuperCartRequest = req.body;
             console.log(data);
-            // const validation = cartItemSchema.validate(data);
-            // if (validation.error) {
-            //     res.status(400).json({
-            //         success: false,
-            //         message: "Validation error",
-            //         error: validation.error.details.map((detail: { message: any; }) => detail.message)
-            //     });
-            //     return;
-
-            // }
-            const update = await cartService.updateCart(data, uid);
+            await cartService.updateCart(data, uid);
             res.status(201).json({
                 success: true,
                 message: "Cart updated successfully",

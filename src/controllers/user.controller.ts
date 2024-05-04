@@ -21,21 +21,14 @@ class UserController {
         try {
             const uid: string = (req as any).userId;
             const validation = userSchema.validate(data);
-            if (validation.error) {
-                res.status(400).json({
-                    success: false,
-                    message: "Validation error",
-                    error: validation.error.details.map((detail: { message: any; }) => detail.message)
-                });
-                return;
-            } else {
-                const add = await userService.creatUser(data, uid);
-                res.status(201).json({
-                    success: true,
-                    message: "user created successfully",
-                    data: { "id": uid, ...data }
-                })
-            }
+
+            const add = await userService.creatUser(data, uid);
+            res.status(201).json({
+                success: true,
+                message: "user created successfully",
+                data: { "id": uid, ...data }
+            })
+
         } catch (error) {
             res.status(500).json({
                 success: false,
@@ -71,15 +64,6 @@ class UserController {
         try {
             const data: UserUpdate = req.body;
 
-            const validation = userUpdateSchema.validate(data);
-            if (validation.error) {
-                res.status(400).json({
-                    success: false,
-                    message: "Validation error",
-                    error: validation.error.details.map((detail: { message: any; }) => detail.message)
-                });
-                return;
-            }
             const update = await userService.updateUser(data, uid);
 
             res.status(201).json({

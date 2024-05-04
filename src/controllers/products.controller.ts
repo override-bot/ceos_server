@@ -100,14 +100,6 @@ class ProductController {
         const data: ProductUpdate = req.body;
         try {
             const { id } = req.params;
-            const validation = productSchema.validate(data);
-            if (validation.error) {
-                res.status(400).json({
-                    success: false,
-                    message: validation.error.details.map((detail: { message: any; }) => detail.message)
-                });
-                return;
-            }
 
             const update = await productService.updateProduct(data, id);
             res.status(201).json({
@@ -142,24 +134,15 @@ class ProductController {
             };
             console.log(req.body)
 
-            const validation = productSchema.validate(data);
-            if (validation.error) {
-                res.status(400).json({
-                    success: false,
-                    message: "Validation error",
-                    error: validation.error.details.map((detail: { message: any; }) => detail.message)
-                });
-                return;
 
-            } else {
-                const add = await productService.addProduct(data);
-                res.status(201).json({
-                    success: true,
-                    message: "product added successfully",
-                    data: { "id": add.id, ...data }
-                });
-            }
-        } catch (error) {
+            const add = await productService.addProduct(data);
+            res.status(201).json({
+                success: true,
+                message: "product added successfully",
+                data: { "id": add.id, ...data }
+            });
+        }
+        catch (error) {
             console.log(error)
             console.log(req.body.sellerId);
             res.status(500).json({

@@ -6,6 +6,6 @@ import cartRouter from "./cart.router";
 
 const router = express.Router();
 router.use("/products", productRouter);
-router.use("/users", userRouter);
+router.use("/user", userRouter);
 router.use("/cart", cartRouter);
 export default router;
