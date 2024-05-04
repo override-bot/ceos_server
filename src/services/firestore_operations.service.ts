@@ -4,6 +4,7 @@ class FirestoreOperations {
     private db: Firestore;
     private ref: CollectionReference;
 
+
     constructor(db: Firestore, private path: string) {
         this.db = db;
         this.ref = this.db.collection(path);
