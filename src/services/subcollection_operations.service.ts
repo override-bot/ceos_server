@@ -3,7 +3,7 @@ import { Firestore, CollectionReference, QuerySnapshot, DocumentSnapshot, Docume
 class SubCollectionOperations {
     private subCollectionRef: CollectionReference;
 
-    constructor(private db: Firestore, private parentDocId: string, private subCollectionPath: string, parentCollection: string) {
+    constructor(private db: Firestore, private parentDocId: string, private subCollectionPath: string, private parentCollection: string) {
         const parentDocRef = this.db.collection(parentCollection).doc(parentDocId);
         this.subCollectionRef = parentDocRef.collection(subCollectionPath);
     }
